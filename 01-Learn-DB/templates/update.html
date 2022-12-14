@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<form action="/update/{{user.id}}" method="POST">
+    <div class="form">
+        <center>
+            <h2>Update User</h2>
+        </center>
+        <div>
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" value="{{user.username}}" required>
+        </div>
+        <div>
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" value="{{user.email}}" required>
+        </div>
+        <div>
+            <label for="age">Age</label>
+            <input type="text" name="age" id="age" value="{{user.age}}" required>
+        </div>
+        <div>
+            <label for="gender">Gender</label>
+            <select name="gender" id="gender" disabled>
+                {{user.gender}}
+                <option value="{{user.gender}}" selected>{{user.gender}}</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Rather Not Say">Rather Not Say</option>
+            </select>
+            <input type="submit" value="Save">
+        </div>
+    </div>
+</form>
+
+{% endblock content %}
