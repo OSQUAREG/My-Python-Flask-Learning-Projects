@@ -4,10 +4,11 @@
 2. Create your virtual environment venv: 
 `py -3 -m venv venv`
 3. Activate your venv: `venv/Scripts/activate`
-4. Install Fast API package: `pip install fastapi`
+4. Install Fast API package: `pip install fastapi[all]`
 5. Install uvicorn to work as the server that runs the code: `pip install uvicorn[standard]`
-6. Then create `main.py` file and start coding.
-7. Start your server using: `uvicorn main:app` This will run the code in your localhost without updating the changes you make to the code. Usually for production.
-8. However, you can use `uvicorn main:app --reload` to continually update your code to the server as you make changes to the code. Good for development.
-Note: `main` is the `main.py` file name and app is the `app` initialized in the `main.py` file
-9. d
+6. Install the Postgres driver for db, psycopg2: `pip install psycopg2`
+7. Then create `main.py` file and start coding.
+8. Start your server using: `uvicorn main:app` This will run the code in your localhost without updating the changes you make to the code. Usually for production. 
+9. However, you can use `uvicorn main:app --reload` to continually update your code to the server as you make changes to the code. Good for development.
+Note: `main` is the `main.py` file name and app is the `app` initialized in the `main.py` file 
+10. Or if its in a package folder e.g folder name: app, `uvicorn app.main:app`
