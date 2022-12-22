@@ -67,6 +67,18 @@ def root():
     return {"message": "Hello, just learning Python Fast API"}
 
 
+# Create Post
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
+def create_post(post: Post):
+    # use %s to avoid SQL injection from users instead of...
+    # cursor.execute("""INSERT INTO posts (title, content, published) VALUE ({post.title}, {post.content}, {post.published}) RETURNING * """))
+    cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """,
+                   (post.title, post.content, post.published))
+    new_post = cursor.fetchone()  # fetch the query result
+    conn.commit()  # save to db
+    return {"data": new_post}
+
+
 # Retrieve All Posts
 @app.get("/posts")
 def get_posts():
@@ -76,24 +88,9 @@ def get_posts():
     return {'data': posts}
 
 
-# Create Post
-@app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_post(post: Post):
-    cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """,
-                   (post.title, post.content, post.published))
-
-    # use %s to avoid SQL injection from users instead of...
-    # cursor.execute("""INSERT INTO posts (title, content, published) VALUE ({post.title}, {post.content},
-    #                                                                          {post.published}) RETURNING * """))
-    new_post = cursor.fetchone()  # fetch the query result
-    conn.commit()  # save to db
-
-    return {"data": new_post}
-
-
 # Retrieve a Post by id
 @app.get("/posts/{id}")
-def get_posts(id: int):
+def get_post(id: int):
     """
     You can pass the id as id:int into the get_post function to convert and validate that it's a number. however,
     we need to convert back to a string to pass is as vars in the query.
@@ -102,8 +99,7 @@ def get_posts(id: int):
     post = cursor.fetchone()
 
     if not post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Post with id: {id} was not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id: {id} was not found")
 
     return {'data': post}
 
@@ -116,13 +112,12 @@ def delete_post(id: int):
     conn.commit()
 
     if post is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Post with id: {id} not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id: {id} not found")
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
     # we can use this...
     # return {"message": f"Post with id: {id} was deleted successfully"}
-    # but when using the 204 status code, no content should be sent, so we will use below instead...
+    # but when using the 204 status code, no content should be sent.
 
 
 # Update a Post
@@ -134,7 +129,6 @@ def update_post(id: int, post: Post):
     conn.commit()
 
     if post is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Post with id: {id} not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id: {id} not found")
 
     return {"data": post}
