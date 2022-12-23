@@ -1,16 +1,25 @@
 from fastapi import Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from typing import List
-from .. import models, schemas
-from ..database import get_db
+from .. import models, schemas, oauth2, database
 
+# Using FastAPI Router with a prefix and tags (to group the routes)
+router = APIRouter(prefix="/posts", tags=["Posts"])  # used instead of importing app from main.py
 
-router = APIRouter()  # used instead of importing app from main.py
+"""
+Notes on Using Dependencies:
+1) `db: Session = Depends(database.get_db)`: are added as argument for path operations that depends on connection/request  to the database.
+
+2) `current_user: int = Depends(oauth2.get_current_user)`: are added as arguments for path operations that needs to verify that user is logged in to perform the path operation and to only allow those logged in.
+"""
 
 
 # Create Post (with SQLAlchemy ORM)
-@router.post("/posts", response_model=schemas.Post)
-def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
+@router.post("/", response_model=schemas.Post)
+def create_post(post: schemas.PostCreate, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
+
+    print(current_user)  # just to print in the terminal the user id accessing the path.
+
     # # Instead of typing in all the fields like this...
     # new_post = models.Post(title=post.title, content=post.content, published=post.published)
 
@@ -23,16 +32,18 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
 
 
 # Retrieve All Posts (with SQLAlchemy ORM)
-@router.get("/posts", response_model=List[schemas.Post])
-def get_posts(db: Session = Depends(get_db)):
+@router.get("/", response_model=List[schemas.Post])
+def get_posts(db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
+    print(current_user)  # just to print in the terminal the user id accessing the path.
     posts = db.query(models.Post).all()
     print(db.query(models.Post))  # to see what actually happens (abstraction) in the terminal.
     return posts
 
 
 # Retrieve a Post by id (with SQLAlchemy ORM)
-@router.get("/posts/{id}", response_model=schemas.Post)
-def get_post(id: int, db: Session = Depends(get_db)):
+@router.get("/{id}", response_model=schemas.Post)
+def get_post(id: int, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
+    print(current_user)  # just to print in the terminal the user id accessing the path.
     post = db.query(models.Post).filter(models.Post.id == id).first()
     # you can also use this...
     # post = db.query(models.Post).get(id)
@@ -44,13 +55,16 @@ def get_post(id: int, db: Session = Depends(get_db)):
 
 
 # Delete a Post (with SQLAlchemy ORM)
-@router.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db)):
-    post = db.query(models.Post).filter(models.Post.id == id).first()
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id: int, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
+    print(current_user)  # just to print in the terminal the user id accessing the path.
+    post = db.query(models.Post).filter(models.Post.id == id)
     # you can also use this...
     # post = db.query(models.Post).get(id)
 
-    if post is None:
+    post_exist = post.first()
+
+    if post_exist is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id: {id} not found")
 
     # db.delete(post)  # this also works, instead of this...
@@ -64,8 +78,10 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 
 
 # Update a Post (with SQLAlchemy ORM)
-@router.put("/posts/{id}", status_code=status.HTTP_202_ACCEPTED, response_model=schemas.Post)
-def update_post(id: int, updated_post: schemas.PostUpdate, db: Session = Depends(get_db)):
+@router.put("/{id}", status_code=status.HTTP_202_ACCEPTED, response_model=schemas.Post)
+def update_post(id: int, updated_post: schemas.PostUpdate, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
+    print(current_user)  # just to print in the terminal the user id accessing the path.
+
     post_to_update = db.query(models.Post).filter(models.Post.id == id)
 
     post = post_to_update.first()

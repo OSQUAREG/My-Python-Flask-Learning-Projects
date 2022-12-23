@@ -4,7 +4,7 @@ from psycopg2.extras import RealDictCursor
 import time
 from sqlalchemy.orm import Session
 from . import models, schemas
-from .routes import post, user
+from .routes import post, user, auth
 from .database import engine, get_db
 
 # from .utils import create_connection
@@ -41,6 +41,7 @@ while True:
 # Include the post and user router from post.py and user.py to the main.py. SO when the code is run, the app goes into the post and user file and find a match to the router.
 app.include_router(post.router)
 app.include_router(user.router)
+app.include_router(auth.router)
 
 
 # Test Get Route (without ORM)
