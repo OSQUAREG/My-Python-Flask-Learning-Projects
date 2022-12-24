@@ -1,6 +1,6 @@
 from fastapi import Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from .. import models, schemas, oauth2, database
 
 # Using FastAPI Router with a prefix and tags (to group the routes)
@@ -12,6 +12,12 @@ Notes on Using Dependencies:
 
 2) `current_user: int = Depends(oauth2.get_current_user)`: are added as arguments for path operations that needs to verify that user is logged in to perform the path operation and to only allow those logged in.
 """
+
+
+# Test Route (with SQLAlchemy ORM)
+@router.get("/test-orm")
+def test_orm(db: Session = Depends(database.get_db)):
+    return {"status": "success"}
 
 
 # Create Post (with SQLAlchemy ORM)
@@ -35,18 +41,28 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(database.get_db)
 
 # Retrieve All Posts (with SQLAlchemy ORM)
 @router.get("/", response_model=List[schemas.Post])
-def get_posts(db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
+def get_posts(db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user),
+              # adding Query Parameters to arguments
+              limit: int = 10, skip: int = 0, search: Optional[str] = ""):
+    """
+    `limit`: use the method ".limit" will limit the number of returned posts;
+    `skip`: use the method ".offset" to skip specified number of posts and return after the skipped posts.
+    `search`: uses the method ".contains" will search for specified string in a specified fields of the posts e.g. in `title`.
+    """
 
     # printing to see what is actually happening (abstraction) in the terminal
     print(current_user.id)  # to see the user id accessing the path in the terminal.
     print(db.query(models.Post))
     print(db.query(models.Post).filter(models.Post.author_id == current_user.id))
 
-    # # to Retrieve all users posts.
+    # # to retrieve all users posts.
     # posts = db.query(models.Post).all()
 
-    # to retrieve only logged-in user's posts.
-    posts = db.query(models.Post).filter(models.Post.author_id == current_user.id).all()
+    # to retrieve posts using the Query Parameters
+    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+
+    # # to retrieve only logged-in user's posts.
+    # posts = db.query(models.Post).filter(models.Post.author_id == current_user.id).all()
 
     return posts
 
@@ -83,8 +99,6 @@ def get_post(id: int, db: Session = Depends(database.get_db), current_user: int 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
 
-    print(current_user.id)  # just to print in the terminal the user id accessing the path.
-
     post_query = db.query(models.Post).filter(models.Post.id == id)
 
     # check if post exists
@@ -109,7 +123,6 @@ def delete_post(id: int, db: Session = Depends(database.get_db), current_user: i
 # Update a Post (with SQLAlchemy ORM)
 @router.put("/{id}", status_code=status.HTTP_202_ACCEPTED, response_model=schemas.Post)
 def update_post(id: int, updated_post: schemas.PostUpdate, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
-    print(current_user)  # just to print in the terminal the user id accessing the path.
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
 

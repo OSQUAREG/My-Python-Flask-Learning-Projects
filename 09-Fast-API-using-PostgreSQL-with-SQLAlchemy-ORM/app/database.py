@@ -2,6 +2,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base  # a function inherited for creating the db models
 from sqlalchemy.orm import sessionmaker
 
+import psycopg2  # postgres db driver
+from psycopg2.extras import RealDictCursor
+import time
+
 """
 Template for connecting to a local DB: 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
@@ -33,3 +37,17 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+# To Create Connection to Postgres Database without ORM
+while True:
+    try:
+        conn = psycopg2.connect(host="localhost", database="fastapi", user="postgres", password="password321",
+                                cursor_factory=RealDictCursor)
+        cursor = conn.cursor()
+        print("Database connection was successful!")  # just to show results in terminal
+        break
+    except Exception as error:
+        print("Connection to database failed.")
+        print("Error: ", error)
+        time.sleep(3)

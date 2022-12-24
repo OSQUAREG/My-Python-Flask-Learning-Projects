@@ -1,7 +1,8 @@
-from .database import Base
+from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
+from .database import Base
 
 
 class Post(Base):
@@ -13,8 +14,11 @@ class Post(Base):
     published = Column(Boolean, server_default='True', nullable=False)
     created_on = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
 
-    # Creating Relationship with the users table
+    # Create Foreign Key for Posts from the users table
     author_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+
+    # Create a Relationship with the User model as an author
+    author = relationship("User")  # to fetch the user details from the User model table.
 
     # NB: for setting default value on Server DBs, use server_default='', instead of: default=True/False for Server Database tables.
 
