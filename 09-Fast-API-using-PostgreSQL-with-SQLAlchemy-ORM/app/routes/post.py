@@ -18,13 +18,14 @@ Notes on Using Dependencies:
 @router.post("/", response_model=schemas.Post)
 def create_post(post: schemas.PostCreate, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
 
-    print(current_user)  # just to print in the terminal the user id accessing the path.
+    print(current_user.id)  # just to print in the terminal the user id accessing the path.
+    print(current_user.email)
 
     # # Instead of typing in all the fields like this...
     # new_post = models.Post(title=post.title, content=post.content, published=post.published)
 
     # # use **post.dict() to unpack the post as a dict into the Post model like this...
-    new_post = models.Post(**post.dict())
+    new_post = models.Post(author_id=current_user.id, **post.dict())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)  # to add the "RETURNING *" statement functionality.
@@ -34,7 +35,9 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(database.get_db)
 # Retrieve All Posts (with SQLAlchemy ORM)
 @router.get("/", response_model=List[schemas.Post])
 def get_posts(db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
+
     print(current_user)  # just to print in the terminal the user id accessing the path.
+
     posts = db.query(models.Post).all()
     print(db.query(models.Post))  # to see what actually happens (abstraction) in the terminal.
     return posts
@@ -57,18 +60,21 @@ def get_post(id: int, db: Session = Depends(database.get_db), current_user: int 
 # Delete a Post (with SQLAlchemy ORM)
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
-    print(current_user)  # just to print in the terminal the user id accessing the path.
-    post = db.query(models.Post).filter(models.Post.id == id)
-    # you can also use this...
-    # post = db.query(models.Post).get(id)
+    print(current_user.id)  # just to print in the terminal the user id accessing the path.
 
-    post_exist = post.first()
+    post_query = db.query(models.Post).filter(models.Post.id == id)
 
-    if post_exist is None:
+    # check if post exists
+    post = post_query.first()
+    if post is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id: {id} not found")
 
+    # check if current user is the author
+    if post.author_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete post")
+
     # db.delete(post)  # this also works, instead of this...
-    post.delete(synchronize_session=False)  # calling the query.delete method
+    post_query.delete(synchronize_session=False)  # calling the query.delete method works without the .first() attribute
     db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -82,14 +88,18 @@ def delete_post(id: int, db: Session = Depends(database.get_db), current_user: i
 def update_post(id: int, updated_post: schemas.PostUpdate, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
     print(current_user)  # just to print in the terminal the user id accessing the path.
 
-    post_to_update = db.query(models.Post).filter(models.Post.id == id)
+    post_qyery = db.query(models.Post).filter(models.Post.id == id)
 
-    post = post_to_update.first()
+    post = post_qyery.first()
 
     if post is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id: {id} not found")
 
-    post_to_update.update(updated_post.dict(), synchronize_session=False)  # calling the query.update method
+    # check if current user is the author
+    if post.author_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete post")
+
+    post_qyery.update(updated_post.dict(), synchronize_session=False)  # calling the query.update method works without the .first() attribute
     db.commit()
 
     return post

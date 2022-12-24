@@ -22,6 +22,7 @@ class PostUpdate(BaseModel):
 class Post(PostBase):
     id: int
     created_on: datetime
+    author_id: int
 
     class Config:
         orm_mode = True
