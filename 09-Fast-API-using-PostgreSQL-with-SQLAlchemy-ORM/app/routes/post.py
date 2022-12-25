@@ -21,26 +21,28 @@ def test_orm(db: Session = Depends(database.get_db)):
 
 
 # Create Post (with SQLAlchemy ORM)
-@router.post("/", response_model=schemas.Post)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
 def create_post(post: schemas.PostCreate, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
 
-    # printing to see what is actually happening (abstraction) in the terminal
-    print(current_user.id)  # just to print in the terminal the user id accessing the path.
-    print(current_user.email)
+    # # printing to see what is actually happening (abstraction) in the terminal
+    # print(current_user.id)  # just to print in the terminal the user id accessing the path.
+    # print(current_user.email)
 
     # # Instead of typing in all the fields like this...
     # new_post = models.Post(title=post.title, content=post.content, published=post.published)
 
-    # # use **post.dict() to unpack the post as a dict into the Post model like this, also sets the current user as the author
+    # sets the current user as the author and use **post.dict() to unpack the new post data as a dict into the Post model like this...
     new_post = models.Post(author_id=current_user.id, **post.dict())
+
     db.add(new_post)
     db.commit()
     db.refresh(new_post)  # to add the "RETURNING *" statement functionality.
+
     return new_post
 
 
 # Retrieve All Posts (with SQLAlchemy ORM)
-@router.get("/", response_model=List[schemas.Post])
+@router.get("/", status_code=status.HTTP_200_OK, response_model=List[schemas.Post])
 def get_posts(db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user),
               # adding Query Parameters to arguments
               limit: int = 10, skip: int = 0, search: Optional[str] = ""):
@@ -50,10 +52,10 @@ def get_posts(db: Session = Depends(database.get_db), current_user: int = Depend
     `search`: uses the method ".contains" will search for specified string in a specified fields of the posts e.g. in `title`.
     """
 
-    # printing to see what is actually happening (abstraction) in the terminal
-    print(current_user.id)  # to see the user id accessing the path in the terminal.
-    print(db.query(models.Post))
-    print(db.query(models.Post).filter(models.Post.author_id == current_user.id))
+    # # printing to see what is actually happening (abstraction) in the terminal
+    # print(current_user.id)  # to see the user id accessing the path in the terminal.
+    # print(db.query(models.Post))
+    # print(db.query(models.Post).filter(models.Post.author_id == current_user.id))
 
     # # to retrieve all users posts.
     # posts = db.query(models.Post).all()
@@ -68,7 +70,7 @@ def get_posts(db: Session = Depends(database.get_db), current_user: int = Depend
 
 
 # Retrieve a Post by id (with SQLAlchemy ORM)
-@router.get("/{id}", response_model=schemas.Post)
+@router.get("/{id}", status_code=status.HTTP_200_OK, response_model=schemas.Post)
 def get_post(id: int, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     # printing to see what is actually happening (abstraction) in the terminal

@@ -39,3 +39,14 @@ class User(Base):
     password = Column(String, nullable=False)
     created_on = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
 
+
+"""
+Composite Keys are primary keys that spans multiple columns. 
+This is used, for example, when you want a user not to like a post twice, and whereas in the table fields, duplicate post_id and user_id can exist.
+"""
+
+
+class Vote(Base):
+    __tablename__ = "votes"
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), primary_key=True)

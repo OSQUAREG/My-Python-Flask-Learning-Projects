@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, EmailStr  # a class for creating Schema
+from pydantic import BaseModel, EmailStr, conint  # a class for creating Schema
+# conint
 
 
 """
@@ -47,7 +48,8 @@ class Post(PostBase):
     id: int
     created_on: datetime
     author_id: int
-    author: User  # returning a pyda ntic model.
+    author: User  # returning a pydantic model.
+    votes: int
 
     class Config:
         orm_mode = True
@@ -80,3 +82,9 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     id: Optional[str] = None
 
+
+class Vote(BaseModel):
+    post_id: int
+    dir: conint(le=1)  # dir is for the direction of the post, 1 for vote and 0 for no vote.
+
+    # NB: the voter_id will come from the token data of the current user.

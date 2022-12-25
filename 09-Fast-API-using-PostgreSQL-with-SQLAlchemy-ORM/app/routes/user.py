@@ -20,7 +20,9 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(database.get_db)
     password_hash = utils.hash_password(user.password)
     user.password = password_hash  # passing the hashed password back to the user.password
 
+    # use **user.dict() to unpack the new user data as a dict into the Post model like this...
     new_user = models.User(**user.dict())
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
