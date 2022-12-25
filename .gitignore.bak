@@ -1,3 +1,16 @@
 # Default ignored files
-/shelf/
-/workspace.xml
+
+# Virtual Environment Folders
+venv/
+learn-db/
+flaskapienv/
+
+
+# Environment Variables
+.flaskenv
+.env
+
+
+# Others
+.idea/
+

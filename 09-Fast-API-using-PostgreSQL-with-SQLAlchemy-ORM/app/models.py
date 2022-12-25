@@ -5,6 +5,15 @@ from sqlalchemy.sql.expression import text
 from .database import Base
 
 
+"""
+Notice that SQLAlchemy models (for creating DB Models) define attributes using =, and pass the type as a parameter to Column, like in:
+name = Column(String)
+
+while Pydantic models (for creating Schemas) declare the types using :, the new type annotation syntax/type hints:
+name: str
+"""
+
+
 class Post(Base):
     __tablename__ = "posts"
 

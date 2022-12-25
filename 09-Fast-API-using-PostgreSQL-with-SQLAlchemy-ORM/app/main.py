@@ -19,4 +19,3 @@ app.include_router(auth.router)
 @app.get("/test")
 def root():
     return {"message": "Hello, just learning Python Fast API"}
-

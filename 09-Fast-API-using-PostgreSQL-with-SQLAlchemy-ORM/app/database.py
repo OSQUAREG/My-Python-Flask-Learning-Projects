@@ -1,23 +1,39 @@
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base  # a function inherited for creating the db models
+from sqlalchemy.ext.declarative import declarative_base  # for creating DB models
 from sqlalchemy.orm import sessionmaker
-
 import psycopg2  # postgres db driver
 from psycopg2.extras import RealDictCursor
 import time
+from .config import settings
 
 """
-Template for connecting to a local DB: 
+# Template for connecting to a local DB: 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 
-Template for connecting to a DB server: 
-SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
-SQLALCHEMY_DATABASE_URL = "postgresql://username:password@ip-address/hostname/db_name"
+# Template for connecting to an external DB server: 
+SQLALCHEMY_DATABASE_URL = "postgresql://database_username:database_password@databsae_hostname:database_port/database_name"
+
+# Saving the Environment Variables in different variables
+db_username = settings.database_username
+db_password = settings.database_password
+db_hostname = settings.database_hostname
+db_port = settings.database_port
+db_name = settings.database_name
+
+# Adding the f string to use the saved variables
+SQLALCHEMY_DATABASE_URL = f"postgresql://{db_username}:{db_password}@{db_hostname}:{db_port}/{db_name}"
 """
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:password321@localhost/fastapi"
+db_username = settings.database_username
+db_password = settings.database_password
+db_hostname = settings.database_hostname
+db_port = settings.database_port
+db_name = settings.database_name
+
+SQLALCHEMY_DATABASE_URL = f"postgresql://{db_username}:{db_password}@{db_hostname}:{db_port}/{db_name}"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

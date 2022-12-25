@@ -3,6 +3,15 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr  # a class for creating Schema
 
 
+"""
+Notice that SQLAlchemy models (for creating DB Models) define attributes using =, and pass the type as a parameter to Column, like in:
+name = Column(String)
+
+while Pydantic models (for creating Schemas) declare the types using :, the new type annotation syntax/type hints:
+name: str
+"""
+
+
 class PostBase(BaseModel):
     title: str
     content: str

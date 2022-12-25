@@ -4,6 +4,7 @@ from datetime import timedelta, datetime
 from fastapi.security import OAuth2PasswordBearer
 from . import schemas, database, models
 from sqlalchemy.orm import Session
+from .config import settings
 
 
 # Dependency: This bears the login path operation URL during which the token is generated.
@@ -18,9 +19,9 @@ Notes on Using Dependencies:
 """
 We will need: 
 """
-SECRET_KEY = "jnasdjjjn3jn3nsjnd3r4"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = settings.secret_key
+ALGORITHM = settings.algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 
 # Function to Create the Access Token During Login Path Operation
