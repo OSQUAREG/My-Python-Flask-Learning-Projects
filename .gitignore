@@ -1,17 +1,16 @@
 # Default ignored files
 
-# Virtual Environment Folders
-venv/
-learn-db/
-flaskapienv/
+**/venv/
+**/learn-db/
+**/flaskapienv/
 
 
 # Environment Variables
-.flaskenv
-.env
+**/.flaskenv
+**/.env
 
 
 # Others
-.idea/
-__pycache__
+**/.idea/
+**/__pycache__
 
