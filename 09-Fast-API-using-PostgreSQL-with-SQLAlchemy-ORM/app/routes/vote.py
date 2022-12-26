@@ -1,6 +1,5 @@
-from fastapi import Response, status, HTTPException, Depends, APIRouter
+from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
-from typing import List, Optional
 from .. import models, schemas, oauth2, database
 
 # Using FastAPI Router with a prefix and tags (to group the routes)
@@ -22,7 +21,7 @@ After, checking if the post exist, then do below checks and actions:
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def voting(vote: schemas.Vote, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
+def voting(vote: schemas.Vote, db: Session = Depends(database.get_db), current_user=Depends(oauth2.get_current_user)):
 
     # Check if post exist
     post = db.query(models.Post).filter(models.Post.id == vote.post_id).first()

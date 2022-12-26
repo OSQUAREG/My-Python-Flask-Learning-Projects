@@ -49,11 +49,17 @@ class Post(PostBase):
     created_on: datetime
     author_id: int
     author: User  # returning a pydantic model.
+
+    class Config:
+        orm_mode = True
+
+
+class PostVote(BaseModel):
+    Post: Post
     votes: int
 
     class Config:
         orm_mode = True
-        # underscore_attrs_are_private = True
 
 
 """

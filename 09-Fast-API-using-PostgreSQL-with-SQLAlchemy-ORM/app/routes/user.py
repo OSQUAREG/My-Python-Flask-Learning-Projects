@@ -30,14 +30,14 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(database.get_db)
     return new_user
 
 
-# Retrieve All Users
+# Read All Users
 @router.get("/", status_code=status.HTTP_200_OK, response_model=List[schemas.User])
 def get_users(db: Session = Depends(database.get_db)):
     users = db.query(models.User).all()
     return users
 
 
-# Retrieve a User
+# Read a User
 @router.get("/{id}", status_code=status.HTTP_200_OK, response_model=schemas.User)
 def get_user(id: int, db: Session = Depends(database.get_db)):
     user = db.query(models.User).get(id)
