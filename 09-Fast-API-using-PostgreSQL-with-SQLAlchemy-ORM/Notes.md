@@ -28,7 +28,8 @@ Note: `main` is the `main.py` file name and app is the `app` initialized in the 
     Remember to first import settings from app.config, then define the variables past into the f string. This will help us avoid hard-coding the env variable values into the sqlalchemy url.
 20. Go to the alembic.ini file, then go to line 58, remove the value for `sqlalchemy.url`. 
 21. Use on the terminal, alembic revision -m to track the changes  like a commit in git.
-22. Create a Migration Script by creating an alembic revision: `alembic revision -m "create posts table"`
+22. Create a Migration Script by creating an alembic revision: `alembic revision -m "create posts table"` or use 
+    `alembic revision --autogenerate -m "auto-create tables`
 23. Go to the version folder and click on the new revision just created and edit the `def upgrade` and `def downgrade`.
 24. On the `def upgrade` function, write the code to perform actions on the database. Then on the `def downgrade` function, write the code to undo it.
 25. 
