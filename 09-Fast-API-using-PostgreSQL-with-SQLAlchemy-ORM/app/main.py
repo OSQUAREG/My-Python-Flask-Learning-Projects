@@ -14,6 +14,7 @@ app = FastAPI()
 # Setting Up CORS Middleware.
 """
 CORS or "Cross-Origin Resource Sharing" refers to the situations when a frontend running in a browser has JavaScript code that communicates with a backend, and the backend is in a different "origin" than the frontend.
+An origin is the combination of protocol (`http`, `https`), domain (`myapp.com`, `localhost`, `localhost.tiangolo.com`), and port (`80`, `443`, `8080`).
 
 Read more about CORS here: https://fastapi.tiangolo.com/tutorial/cors/
 See how to setup here: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
@@ -21,7 +22,7 @@ See how to setup here: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 Middleware is a basically a function used in most framework that runs before any request.
 """
 
-origins = ["https://web.facebook.com", "https://www.youtube.com"]
+origins = ["*"]
 
 # use a wildcard "*" if you want your API to communicate with all sites, or specify the domain your API is created for. For example, ["https://www.google.com", "https://www.facebook.com"]
 
